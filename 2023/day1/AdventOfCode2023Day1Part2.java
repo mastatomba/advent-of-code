@@ -1,4 +1,4 @@
-package nl.schoutens;
+package nl.schoutens.adventofcode;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class AdventOfCodeDay1SumOfAllCalibrationValues {
+public class AdventOfCode2023Day1Part2 {
 
     public static void main(String[] args) throws IOException {
         // Result should be 54078
