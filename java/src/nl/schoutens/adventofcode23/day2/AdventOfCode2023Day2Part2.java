@@ -1,4 +1,4 @@
-package nl.schoutens.adventofcode;
+package nl.schoutens.adventofcode23.day2;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 public class AdventOfCode2023Day2Part2 {
 
     public static void main(String[] args) throws IOException {
-        String fileName = "input.txt";
+        String fileName = "resources/input/2023/day2/input.txt";
         int sumOfPowerOfTheSets = calculateSumOfPowerOfTheSets(fileName, StandardCharsets.UTF_8);
         System.out.println("The sum of the power of the sets: " + sumOfPowerOfTheSets);
     }

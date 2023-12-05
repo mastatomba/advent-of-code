@@ -1,4 +1,4 @@
-package nl.schoutens.adventofcode;
+package nl.schoutens.adventofcode23.day4;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,13 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * Question: What is the total number of scratchcards?
@@ -21,7 +17,7 @@ import java.util.regex.Pattern;
 public class AdventOfCode2023Day4Part2 {
 
     public static void main(String[] args) throws IOException {
-        String fileName = "input.txt";
+        String fileName = "resources/input/2023/day4/input.txt";
         int totalNumberOfScratchCards = calculateTotalNumberOfScratchCards(fileName, StandardCharsets.UTF_8);
         System.out.println("Total number of scratchcards: " + totalNumberOfScratchCards);
     }

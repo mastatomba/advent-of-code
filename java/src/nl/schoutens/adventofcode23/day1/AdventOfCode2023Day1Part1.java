@@ -1,4 +1,4 @@
-package nl.schoutens.adventofcode;
+package nl.schoutens.adventofcode23.day1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 public class AdventOfCode2023Day1Part1 {
 
     public static void main(String[] args) throws IOException {
-        String fileName = "input.txt";
+        String fileName = "resources/input/2023/day1/input.txt";
         int sumOfCalibrationValues = calculateSumOfCalibrationValues(fileName, StandardCharsets.UTF_8);
         System.out.println("Sum of all calibration values: " + sumOfCalibrationValues);
     }
