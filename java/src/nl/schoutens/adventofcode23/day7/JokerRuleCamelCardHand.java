@@ -38,7 +38,17 @@ public class JokerRuleCamelCardHand extends CamelCardHand {
                 } else if (cardCounts.contains(3)) {
                     this.handType = CamelCardHand.TYPE_FOUR_OF_A_KIND;
                 } else if (cardCounts.contains(2)) {
-                    this.handType = CamelCardHand.TYPE_THREE_OF_A_KIND;
+                    int pairs = 0;
+                    for (Integer cardCount: cardCounts) {
+                        if (cardCount == 2) {
+                            pairs++;
+                        }
+                    }
+                    if (pairs == 2) {
+                        this.handType = CamelCardHand.TYPE_FULL_HOUSE;
+                    } else {
+                        this.handType = CamelCardHand.TYPE_THREE_OF_A_KIND;
+                    }
                 } else {
                     this.handType = CamelCardHand.TYPE_ONE_PAIR;
                 }

@@ -18,7 +18,7 @@ import java.util.List;
 public class AdventOfCode2023Day7Part1 {
 
     public static void main(String[] args) throws IOException {
-        String fileName = "resources/input/2023/day7/input.txt";
+        String fileName = "resources/input/2023/day7/input_test.txt";
         long totalWinnings = calculateTotalWinnings(fileName, StandardCharsets.UTF_8);
         System.out.println("Total winnings: " + totalWinnings);
     }
