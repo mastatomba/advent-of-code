@@ -1,5 +1,7 @@
 package nl.schoutens.util;
 
+import java.util.List;
+
 public class NumberUtils {
     /**
      * Find the GCD (Greatest Common Divisor) of two numbers.
@@ -18,5 +20,9 @@ public class NumberUtils {
      */
     public static long calculateLcm(long x, long y) {
         return (x / findGcd(x, y)) * y;
+    }
+
+    public static int[] convertToIntArray(List<Integer> list) {
+        return list.stream().mapToInt(Integer::intValue).toArray();
     }
 }
