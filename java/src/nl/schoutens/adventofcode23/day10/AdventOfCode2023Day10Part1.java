@@ -36,9 +36,8 @@ public class AdventOfCode2023Day10Part1 {
         br.close();
 
         Point startPosition = findStartPosition(tileRows);
-        
-        
-        int numberOfSteps = 0;
+        System.out.println(startPosition);
+        int numberOfSteps = getNumberOfSteps(tileRows, startPosition, startPosition, 0);
         return numberOfSteps;
     }
 
@@ -52,8 +51,15 @@ public class AdventOfCode2023Day10Part1 {
         return new Point(-1, -1);
     }
 
-    private static int getNumberOfSteps(List<String> tileRows, Point currentPosition, int currentNumberOfSteps) {
+    private static int getNumberOfSteps(List<String> tileRows, Point currentPosition, Point previousPosition, int currentNumberOfSteps) {
         char currentTile = getTileAt(tileRows, currentPosition);
+
+        System.out.println(currentPosition.x + "," + currentPosition.y + " (" + currentTile + "): " + currentNumberOfSteps);
+
+        if (currentNumberOfSteps >= 3000) {
+            return currentNumberOfSteps;
+        }
+
         boolean checkNorth = false;
         boolean checkSouth = false;
         boolean checkEast = false;
@@ -84,16 +90,112 @@ public class AdventOfCode2023Day10Part1 {
             checkEast = true;
         }
 
-        if (checkNorth) {
-            char northTile = getTileAt(tileRows, new Point(currentPosition.x-1, currentPosition.y));
-            
+        if (checkNorth && currentPosition.x > 0) {
+            Point nextPosition = new Point(currentPosition.x-1, currentPosition.y);
+            if (!isSamePosition(nextPosition, previousPosition)) {
+                char tile = getTileAt(tileRows, nextPosition);
+
+                // System.out.println("\t"+currentTile+"^ NORTH: "+nextPosition.x + "," + nextPosition.y + " (" + tile + ")");
+
+                if (tile == 'S') {
+                    System.out.println("\t\tS found!");
+
+                    return currentNumberOfSteps;
+                }
+                if (checkNorthPath(currentTile, tile)) {
+                    int stepAmount = getNumberOfSteps(tileRows, nextPosition, currentPosition, currentNumberOfSteps+1);
+                    if (stepAmount > 0) {
+                        return stepAmount;
+                    }
+                }
+            }
+        }
+        if (checkSouth && currentPosition.x < tileRows.size()-1) {
+            Point nextPosition = new Point(currentPosition.x+1, currentPosition.y);
+            if (!isSamePosition(nextPosition, previousPosition)) {
+                char tile = getTileAt(tileRows, nextPosition);
+
+                // System.out.println("\t"+currentTile+"v SOUTH: "+nextPosition.x + "," + nextPosition.y + " (" + tile + ")");
+
+                if (tile == 'S') {
+                    System.out.println("\t\tS found!");
+
+                    return currentNumberOfSteps;
+                }
+                if (checkSouthPath(currentTile, tile)) {
+                    int stepAmount = getNumberOfSteps(tileRows, nextPosition, currentPosition, currentNumberOfSteps+1);
+                    if (stepAmount > 0) {
+                        return stepAmount;
+                    }
+                }
+            }
+        }
+        if (checkEast && currentPosition.y > 0) {
+            Point nextPosition = new Point(currentPosition.x, currentPosition.y-1);
+            if (!isSamePosition(nextPosition, previousPosition)) {
+                char tile = getTileAt(tileRows, nextPosition);
+
+                // System.out.println("\t"+currentTile+"< EAST: "+nextPosition.x + "," + nextPosition.y + " (" + tile + ")");
+
+                if (tile == 'S') {
+                    System.out.println("\t\tS found!");
+
+                    return currentNumberOfSteps;
+                }
+                if (checkEastPath(currentTile, tile)) {
+                    int stepAmount = getNumberOfSteps(tileRows, nextPosition, currentPosition, currentNumberOfSteps+1);
+                    if (stepAmount > 0) {
+                        return stepAmount;
+                    }
+                }
+            }
+        }
+        if (checkWest && currentPosition.y < tileRows.get(0).length()-1) {
+            Point nextPosition = new Point(currentPosition.x, currentPosition.y+1);
+            if (!isSamePosition(nextPosition, previousPosition)) {
+                char tile = getTileAt(tileRows, nextPosition);
+
+                // System.out.println("\t"+currentTile+"> WEST: "+nextPosition.x + "," + nextPosition.y + " (" + tile + ")");
+
+                if (tile == 'S') {
+                    System.out.println("\t\tS found!");
+
+                    return currentNumberOfSteps;
+                }
+                if (checkWestPath(currentTile, tile)) {
+                    int stepAmount = getNumberOfSteps(tileRows, nextPosition, currentPosition, currentNumberOfSteps+1);
+                    if (stepAmount > 0) {
+                        return stepAmount;
+                    }
+                }
+            }
         }
 
+        return -1;
+    }
 
+    private static boolean checkNorthPath(char fromTile, char toTile) {
+        return (toTile == '|' || toTile == 'F' || toTile == '7');
+    }
+
+    private static boolean checkSouthPath(char fromTile, char toTile) {
+        return (toTile == '|' || toTile == 'L' || toTile == 'J');
+    }
+
+    private static boolean checkEastPath(char fromTile, char toTile) {
+        return (toTile == '-' || toTile == 'L' || toTile == 'F');
+    }
+
+    private static boolean checkWestPath(char fromTile, char toTile) {
+        return (toTile == '-' || toTile == 'J' || toTile == '7');
     }
 
     private static char getTileAt(List<String> tileRows, Point position) {
         return tileRows.get(position.x).charAt(position.y);
+    }
+
+    private static boolean isSamePosition(Point position1, Point position2) {
+        return position1.x==position2.x && position1.y==position2.y;
     }
 
     private static void writeFileWithImpossiblePipesRemoved(List<String> tileRows) {
