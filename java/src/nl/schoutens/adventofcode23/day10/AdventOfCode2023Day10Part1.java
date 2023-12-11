@@ -14,8 +14,16 @@ import java.awt.Point;
 
 /**
  * Question: Find the single giant loop starting at S. How many steps along the loop does it take to get from the starting position to the point farthest from the starting position?
+ * Tip: add -Xss4m to prevent StackOverFlowError
  */
 public class AdventOfCode2023Day10Part1 {
+    private static char VERTICAL_PIPE = '|';
+    private static char HORIZONTAL_PIPE = '-';
+    private static char BEND_F = 'F';
+    private static char BEND_7 = '7';
+    private static char BEND_L = 'L';
+    private static char BEND_J = 'J';
+
     public static void main(String[] args) throws IOException {
         String fileName = "resources/input/2023/day10/input.txt";
         int numberOfSteps = calculateNumberOfSteps(fileName, StandardCharsets.UTF_8);
@@ -37,8 +45,212 @@ public class AdventOfCode2023Day10Part1 {
 
         Point startPosition = findStartPosition(tileRows);
         System.out.println(startPosition);
-        int numberOfSteps = getNumberOfSteps(tileRows, startPosition, startPosition, 0);
-        return numberOfSteps;
+
+        List<Point> nodes = new ArrayList<>();
+        nodes.add(startPosition);
+        boolean foundMainLoop = false;
+        try {
+            nodes = traverseNorth(tileRows, nodes, startPosition);
+            foundMainLoop = true;
+        }
+        catch (Exception e) {
+            System.out.println("north was not a success");
+        }
+        if (!foundMainLoop) {
+            try {
+                nodes = traverseSouth(tileRows, nodes, startPosition);
+                foundMainLoop = true;
+            }
+            catch (Exception e) {
+                System.out.println("south was not a success");
+            }
+        }
+        if (!foundMainLoop) {
+            try {
+                nodes = traverseEast(tileRows, nodes, startPosition);
+                foundMainLoop = true;
+            }
+            catch (Exception e) {
+                System.out.println("east was not a success");
+            }
+        }
+        if (!foundMainLoop) {
+            try {
+                nodes = traverseWest(tileRows, nodes, startPosition);
+                foundMainLoop = true;
+            }
+            catch (Exception e) {
+                System.out.println("west was not a success");
+            }
+        }
+
+        if (foundMainLoop) {
+            System.out.println(nodes.size());
+            return 1;
+        } else {
+            System.out.println("Main loop was not found..");
+            return 0;
+        }
+    }
+
+    private static List<Point> traverseNorth(
+        List<String> tileRows,
+        List<Point> nodes,
+        Point fromPosition
+    ) throws Exception {
+        if (fromPosition.x == 0) {
+            throw new Exception("Cannot traverse north from first row");
+        }
+
+        Point toPosition = new Point(fromPosition.x-1, fromPosition.y);
+        nodes.add(toPosition);
+
+        char toTile = getTileAt(tileRows, toPosition);
+        if (toTile == 'S') {
+            System.out.println("\t\tS found!");
+
+            return nodes;
+        }
+        if (toTile == VERTICAL_PIPE) {
+            try {
+                return traverseNorth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_7) {
+            try {
+                return traverseEast(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_F) {
+            try {
+                return traverseWest(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+
+        throw new Exception("Cannot traverse north");
+    }
+
+    private static List<Point> traverseSouth(
+        List<String> tileRows,
+        List<Point> nodes,
+        Point fromPosition
+    ) throws Exception {
+        if (fromPosition.x == tileRows.size()-1) {
+            throw new Exception("Cannot traverse south from last row");
+        }
+
+        Point toPosition = new Point(fromPosition.x+1, fromPosition.y);
+        nodes.add(toPosition);
+
+        char toTile = getTileAt(tileRows, toPosition);
+        if (toTile == 'S') {
+            System.out.println("\t\tS found!");
+
+            return nodes;
+        }
+        if (toTile == VERTICAL_PIPE) {
+            try {
+                return traverseSouth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_J) {
+            try {
+                return traverseEast(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_L) {
+            try {
+                return traverseWest(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+
+        throw new Exception("Cannot traverse south");
+    }
+
+    private static List<Point> traverseEast(
+        List<String> tileRows,
+        List<Point> nodes,
+        Point fromPosition
+    ) throws Exception {
+        if (fromPosition.y == 0) {
+            throw new Exception("Cannot traverse east from first column");
+        }
+
+        Point toPosition = new Point(fromPosition.x, fromPosition.y-1);
+        nodes.add(toPosition);
+
+        char toTile = getTileAt(tileRows, toPosition);
+        if (toTile == 'S') {
+            System.out.println("\t\tS found!");
+
+            return nodes;
+        }
+        if (toTile == HORIZONTAL_PIPE) {
+            try {
+                return traverseEast(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_F) {
+            try {
+                return traverseSouth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_L) {
+            try {
+                return traverseNorth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+
+        throw new Exception("Cannot traverse east");
+    }
+
+    private static List<Point> traverseWest(
+        List<String> tileRows,
+        List<Point> nodes,
+        Point fromPosition
+    ) throws Exception {
+        if (fromPosition.y == tileRows.get(0).length()-1) {
+            throw new Exception("Cannot traverse west from last column");
+        }
+
+        Point toPosition = new Point(fromPosition.x, fromPosition.y+1);
+        nodes.add(toPosition);
+
+        char toTile = getTileAt(tileRows, toPosition);
+        if (toTile == 'S') {
+            System.out.println("\t\tS found!");
+
+            return nodes;
+        }
+        if (toTile == HORIZONTAL_PIPE) {
+            try {
+                return traverseWest(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_7) {
+            try {
+                return traverseSouth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+        if (toTile == BEND_J) {
+            try {
+                return traverseNorth(tileRows, nodes, toPosition);
+            }
+            catch (Exception e) {}
+        }
+
+        throw new Exception("Cannot traverse west");
     }
 
     private static Point findStartPosition(List<String> tileRows) {
