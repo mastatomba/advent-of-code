@@ -22,6 +22,23 @@ public class MirrorRow {
         return this.patternString.charAt(patternIndex);
     }
 
+    public int getColumnSize() {
+        return this.patternString.length();
+    }
+
+    public void flipPattern(int patternIndex) {
+        char currentPattern = this.patternString.charAt(patternIndex);
+        char newPattern = '#';
+        if (currentPattern == '#') {
+            newPattern = '.';
+        }
+        this.patternString = this.patternString.substring(0, patternIndex) + newPattern + this.patternString.substring(patternIndex + 1);
+    }
+
+    public MirrorRow createCopy() {
+        return new MirrorRow(this.patternString);
+    }
+
     @Override
     public String toString() {
         return this.patternString;

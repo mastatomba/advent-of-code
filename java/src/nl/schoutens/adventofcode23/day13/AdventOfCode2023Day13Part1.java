@@ -9,14 +9,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import nl.schoutens.util.StringUtils;
 
 /**
- * Question: Find the line of reflection in each of the patterns in your notes. What number do you get after summarizing all of your notes?
+ * Question: In each pattern, fix the smudge and find the different line of reflection. What number do you get after summarizing the new reflection line in each pattern in your notes?
  */
 public class AdventOfCode2023Day13Part1 {
     public static void main(String[] args) throws IOException {
-        String fileName = "resources/input/2023/day13/input_story.txt";
+        String fileName = "resources/input/2023/day13/input.txt";
         int summarizeSum = calculateSummarizeSum(fileName, StandardCharsets.UTF_8);
         System.out.println("Summarize sum: " + summarizeSum);
     }
@@ -30,12 +29,11 @@ public class AdventOfCode2023Day13Part1 {
 
         List<MirrorCollection> mirrorCollections = new ArrayList<>();
         MirrorCollection mirrorCollection = new MirrorCollection();
-        mirrorCollections.add(mirrorCollection);
 
         while((line = br.readLine()) != null) {
             if (line.isEmpty()) {
-                mirrorCollection = new MirrorCollection();
                 mirrorCollections.add(mirrorCollection);
+                mirrorCollection = new MirrorCollection();
             } else {
                 mirrorCollection.add(new MirrorRow(line));
             }
@@ -47,7 +45,10 @@ public class AdventOfCode2023Day13Part1 {
         for(int i=0; i<mirrorCollections.size(); i++) {
             System.out.println("Summarize collection " + (i+1));
 
-            summarizeSum += mirrorCollections.get(i).summarize();
+            SummarizeResult result = mirrorCollections.get(i).summarize().get(0);
+            System.out.println("\t" + result);
+            
+            summarizeSum += result.calculateResult();
         }
 
         return summarizeSum;

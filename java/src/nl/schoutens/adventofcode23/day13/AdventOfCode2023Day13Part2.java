@@ -9,50 +9,49 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import nl.schoutens.util.StringUtils;
 
 /**
- * Question: Unfold your condition records; what is the new sum of possible arrangement counts?
+ * Question: Find the line of reflection in each of the patterns in your notes. What number do you get after summarizing all of your notes?
  */
 public class AdventOfCode2023Day13Part2 {
     public static void main(String[] args) throws IOException {
-        String fileName = "resources/input/2023/day12/input_story.txt";
-        int numberOfPossibleArrangements = calculateNumberOfPossibleArrangements(fileName, StandardCharsets.UTF_8);
-        System.out.println("Number of possible arrangements: " + numberOfPossibleArrangements);
+        String fileName = "resources/input/2023/day13/input.txt";
+        // submitted: 27841
+        int summarizeSum = calculateSummarizeSum(fileName, StandardCharsets.UTF_8);
+        System.out.println("Summarize sum: " + summarizeSum);
     }
 
-    private static int calculateNumberOfPossibleArrangements(String fileName, Charset cs) throws IOException {
+    private static int calculateSummarizeSum(String fileName, Charset cs) throws IOException {
         File file = new File(fileName);
         FileInputStream fis = new FileInputStream(file);
         InputStreamReader isr = new InputStreamReader(fis, cs);
         BufferedReader br = new BufferedReader(isr);
         String line;
 
-        List<MirrorRow> springRows = new ArrayList<>();
-        while((line = br.readLine()) != null){
-            springRows.add(createSpringRow(line));
+        List<MirrorCollection> mirrorCollections = new ArrayList<>();
+        MirrorCollection mirrorCollection = new MirrorCollection();
+
+        while((line = br.readLine()) != null) {
+            if (line.isEmpty()) {
+                mirrorCollections.add(mirrorCollection);
+                mirrorCollection = new MirrorCollection();
+            } else {
+                mirrorCollection.add(new MirrorRow(line));
+            }
         }
+        mirrorCollections.add(mirrorCollection);
         br.close();
 
-        int numberOfPossibleArrangements = 0;
-        for (MirrorRow springRow : springRows) {
-            numberOfPossibleArrangements += springRow.getNumberOfPossibleArrangements();
+        int summarizeSum = 0;
+        for(int i=0; i<mirrorCollections.size(); i++) {
+            System.out.println("Summarize collection " + (i+1));
+
+            SummarizeResult result = mirrorCollections.get(i).fixSmudgeAndSummarize();
+            System.out.println("\t" + result);
+
+            summarizeSum += result.calculateResult();
         }
 
-        return numberOfPossibleArrangements;
-    }
-
-    /**
-     * Example input: ???.### 1,1,3
-     */
-    private static MirrorRow createSpringRow(String line) {
-        String[] splittedLine = line.split(" ");
-        String conditionRecords = splittedLine[0];
-        String damagedSpringGroups = splittedLine[1];
-        for (int i=0; i<4; i++) {
-            conditionRecords += "?" + splittedLine[0];
-            damagedSpringGroups += "," + splittedLine[1];
-        }
-        return new MirrorRow(conditionRecords, StringUtils.extractNumbersFromString(damagedSpringGroups));
+        return summarizeSum;
     }
 }
