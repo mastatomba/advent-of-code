@@ -22,4 +22,8 @@ public class StringUtils {
 
         return Arrays.stream(str.trim().split(" ")).mapToLong(Long::parseLong).toArray();
     }
+
+    public static int countCharacterInString(String str, char character) {
+        return (int)str.chars().filter(ch -> ch == character).count();
+    }
 }
