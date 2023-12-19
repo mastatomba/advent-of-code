@@ -20,74 +20,73 @@ public class DigPlan {
 
         // digSite.printToConsole();
 
-        int rowIndex = 0;
-        int columnIndex = 0;
+        int rowIndex = digSite.getStartRowIndex();
+        int columnIndex = digSite.getStartColumnIndex();
         for (DigPlanRow digPlanRow : digPlanRows) {
             int newRowIndex = rowIndex + digPlanRow.getRowOffset();
             int newColumnIndex = columnIndex + digPlanRow.getColumnOffset();
 
             digSite.dig(
-                rowIndex < newRowIndex ? rowIndex : newRowIndex,
-                rowIndex < newRowIndex ? newRowIndex : rowIndex,
-                columnIndex < newColumnIndex ? columnIndex : newColumnIndex,
-                columnIndex < newColumnIndex ? newColumnIndex : columnIndex
+                rowIndex,
+                columnIndex,
+                newRowIndex,
+                newColumnIndex
             );
 
             rowIndex = newRowIndex;
             columnIndex = newColumnIndex;
         }
 
-        digSite.printToConsole();
+        // digSite.printToConsole();
 
         return digSite.getCubicMeterDigged(includeInnerArea);
     }
 
     private DigSite createDigSite() throws Exception {
-        StringGrid stringGrid = new StringGrid();
-        int rowSize = this.getTrenchRowSize();
-        int columnSize = this.getTrenchColumnSize();
-        String groundRow = ".".repeat(columnSize);
-        for (int i=0; i<rowSize; i++) {
-            stringGrid.addRow(groundRow);
-        }
-        return new DigSite(stringGrid);
-    }
-
-    private int getTrenchRowSize() {
         int y = 0;
-        int rowSize = 0;
+        int x = 0;
+        int positiveRowIndex = 0;
+        int negativeRowIndex = 0;
+        int positiveColumnIndex = 0;
+        int negativeColumnIndex = 0;
+
         for (DigPlanRow digPlanRow : this.digPlanRows) {
             if (digPlanRow.getDirection() == 'D') {
                 y += digPlanRow.getNumberOfMeters();
-                if (y > rowSize) {
-                    rowSize = y;
+                if (y > positiveRowIndex) {
+                    positiveRowIndex = y;
                 }
             } else if (digPlanRow.getDirection() == 'U') {
                 y -= digPlanRow.getNumberOfMeters();
-                if (y < 0) {
-                    System.err.println("Y pos less than 0??: " + y);
+                if (y < negativeRowIndex) {
+                    negativeRowIndex = y;
                 }
             }
         }
-        return rowSize + 1;
-    }
 
-    private int getTrenchColumnSize() {
-        int x = 0;
-        int columnSize = 0;
         for (DigPlanRow digPlanRow : this.digPlanRows) {
             if (digPlanRow.getDirection() == 'R') {
                 x += digPlanRow.getNumberOfMeters();
-                if (x > columnSize) {
-                    columnSize = x;
+                if (x > positiveColumnIndex) {
+                    positiveColumnIndex = x;
                 }
             } else if (digPlanRow.getDirection() == 'L') {
                 x -= digPlanRow.getNumberOfMeters();
-                if (x < 0) {
-                    System.err.println("X pos less than 0??: " + x);
+                if (x < negativeColumnIndex) {
+                    negativeColumnIndex = x;
                 }
             }
         }
-        return columnSize + 1;
+
+        int rowSize = positiveRowIndex - negativeRowIndex + 1;
+        int columnSize = positiveColumnIndex - negativeColumnIndex + 1;
+        StringGrid stringGrid = new StringGrid();
+        String groundRow = ".".repeat(columnSize);
+
+        for (int i=0; i<rowSize; i++) {
+            stringGrid.addRow(groundRow);
+        }
+
+        return new DigSite(stringGrid, (0-negativeRowIndex), (0-negativeColumnIndex));
     }
 }

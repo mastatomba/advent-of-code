@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Question: The Elves are concerned the lagoon won't be large enough; if they follow their dig plan, how many cubic meters of lava could it hold?
+ * Given answer: 37134 (too high)
+ * New answer:   37759 (too high, luckily not given)
  */
 public class AdventOfCode2023Day18Part1 {
     public static void main(String[] args) throws Exception {
