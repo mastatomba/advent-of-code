@@ -36,9 +36,13 @@ public class Part {
         return 0;
     }
 
+    public int getRating() {
+        return cat_x + cat_m + cat_a + cat_s;
+    }
+
     @Override
     public String toString() {
-        return "x=" + cat_x + ",m=" + cat_m + ",a=" + cat_a + ",s=" + cat_s;
+        return "Part[x=" + cat_x + ",m=" + cat_m + ",a=" + cat_a + ",s=" + cat_s + ",rating="+getRating()+"]";
     }
 
     /**
@@ -52,6 +56,27 @@ public class Part {
             getPartCategoryValueFromInput(input, 'a'),
             getPartCategoryValueFromInput(input, 's')
         );
+    }
+
+    public static long calculateNumberOfCombinations(
+        int min_cat_x,
+        int max_cat_x,
+        int min_cat_m,
+        int max_cat_m,
+        int min_cat_a,
+        int max_cat_a,
+        int min_cat_s,
+        int max_cat_s
+    ) {
+        long numberOfCombinations = 1;
+        numberOfCombinations *= (long)(max_cat_x - min_cat_x + 1);
+        numberOfCombinations *= (long)(max_cat_m - min_cat_m + 1);
+        numberOfCombinations *= (long)(max_cat_a - min_cat_a + 1);
+        numberOfCombinations *= (long)(max_cat_s - min_cat_s + 1);
+
+        System.out.println(numberOfCombinations);
+
+        return numberOfCombinations;
     }
 
     private static int getPartCategoryValueFromInput(String input, char category) {

@@ -23,5 +23,19 @@ public class TestPart {
                 System.out.println("\tNo");
             }
         }
+
+        long number = 0;
+
+        number += Part.calculateNumberOfCombinations(1, 4000, 2091, 4000, 2006, 4000, 1, 1350);
+        number += Part.calculateNumberOfCombinations(1, 4000, 1, 838, 1, 1716, 1351, 2770);
+        number += Part.calculateNumberOfCombinations(1, 4000, 1549, 4000, 1, 4000, 2771, 3448);
+        number += Part.calculateNumberOfCombinations(1, 4000, 1, 1548, 1, 4000, 2771, 3448);
+        number += Part.calculateNumberOfCombinations(1, 2440, 1, 2090, 2006, 4000, 537, 1350);
+        number += Part.calculateNumberOfCombinations(1, 4000, 1, 4000, 1, 4000, 3449, 4000);
+        number += Part.calculateNumberOfCombinations(1, 1415, 1, 4000, 1, 2005, 1, 1350);
+        number += Part.calculateNumberOfCombinations(2663, 4000, 1, 4000, 1, 2005, 1, 1350);
+        number += Part.calculateNumberOfCombinations(1, 4000, 839, 1800, 1, 4000, 1351, 2770);
+
+        System.out.println("Total: "+number);
     }
 }

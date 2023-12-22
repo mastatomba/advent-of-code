@@ -14,11 +14,13 @@ public class Condition {
     }
     
     public boolean matches(Part part) {
+        // System.out.println(condition);
+
         char part_category = getPartCategory();
         char operator = getOperator();
         int value = getValue();
 
-        // System.out.println(condition + ": " + part_category + " " + operator + " " + value);
+        // System.out.println("\t" + part_category + " " + operator + " " + value);
 
         switch (operator) {
             case '>': return part.getPartCategoryValue(part_category) > value;
@@ -28,6 +30,19 @@ public class Condition {
                 break;
         }
         return false;
+    }
+
+    public void applyBounds(RatingBound ratingBound, boolean inverse) {
+        char part_category = getPartCategory();
+        char operator = getOperator();
+        int value = getValue();
+
+        // System.out.println(part_category + " " + operator + " " + value + ", " + (inverse?"inverse":"normal"));
+        // System.out.println(ratingBound);
+
+        ratingBound.applyBounds(part_category, operator, value, inverse);
+
+        // System.out.println(ratingBound);
     }
 
     /**
@@ -50,6 +65,6 @@ public class Condition {
 
     @Override
     public String toString() {
-        return condition;
+        return "Condition[" + condition + "]";
     }
 }

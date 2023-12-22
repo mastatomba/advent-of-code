@@ -11,16 +11,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.schoutens.adventofcode23.day18.DigPlan;
-import nl.schoutens.adventofcode23.day18.DigPlanRow;
-
 /**
  * Question: Sort through all of the parts you've been given; what do you get if you add 
  * together all of the rating numbers for all of the parts that ultimately get accepted?
  */
 public class AdventOfCode2023Day19Part1 {
     public static void main(String[] args) throws Exception {
-        String fileName = "resources/input/2023/day19/input_story.txt";
+        String fileName = "resources/input/2023/day19/input.txt";
         long ratingNumberTotal = calculateRatingNumberTotal(fileName, StandardCharsets.UTF_8);
         System.out.println("Sum of rating numbers: " + ratingNumberTotal);
     }
@@ -52,17 +49,24 @@ public class AdventOfCode2023Day19Part1 {
 
         for (Part part : parts) {
             // System.out.println(part);
+
+            Workflow workflow = workflows.get("in");
+            String destination = workflow.getDestination(part);
+            int workflowCount = 1;
+
+            // System.out.println("\t"+(workflowCount++)+"." + destination);
+
+            while (!destination.equals("A") && !destination.equals("R")) {
+                workflow = workflows.get(destination);
+                destination = workflow.getDestination(part);
+
+                // System.out.println("\t"+(workflowCount++)+"." + destination);
+            }
+            if (destination.equals("A")) {
+                ratingNumberTotal += part.getRating();
+            }
         }
 
         return ratingNumberTotal;
-    }
-
-    /*
-     * Example input:
-     * R 6 (#70c710)
-     */
-    private static DigPlanRow createDigPlanRow(String line) {
-        String[] splitted = line.split(" ");
-        return new DigPlanRow(splitted[0].charAt(0), Integer.parseInt(splitted[1]), splitted[2]);
     }
 }
