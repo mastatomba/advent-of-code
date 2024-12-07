@@ -81,22 +81,35 @@ def find_guard():
 def move_guard(guard: Guard, grid):
     visited = {}
     visited[guard.get_key()] = 1
-    max_moves = 12000
+    max_moves = 200000
     move_count = 0
-    while move_count < max_moves and not guard.is_exit():
+    while move_count < max_moves:
         guard.move(grid)
         move_count += 1
         # print(grid)
         if (guard.get_key() in visited):
             visited[guard.get_key()] += 1
-            if (visited[guard.get_key()] == 100):
-                return {}
+            if visited[guard.get_key()] > 100:
+                if is_loop(visited, visited[guard.get_key()] - 10):
+                    return {}
         else:
             visited[guard.get_key()] = 1
+        
+        if guard.is_exit():
+            return visited
 
-    if (move_count == max_moves):
-        return {}
-    return visited
+    print(f"max moves: {move_count}")
+    return {}
+
+def is_loop(visited: dict, visit_count: int):
+    count = 0
+    for pos in visited:
+        if (visited[pos] > visit_count):
+            count += 1
+            if (count >= 4):
+                # print(f"loop found!: {visited}")
+                return True
+    return False
 
 def find_obstructive_positions(visited: dict):
     position_count = 0
@@ -112,6 +125,9 @@ def find_obstructive_positions(visited: dict):
             # print(f"  check move guard on position ({row},{col}): {len(visited2)}")
             if (len(visited2) == 0):
                 position_count += 1
+        else:
+            if (row != _guard.row and col != _guard.col):
+                print(f"Unexpected cell '{c}' ({row},{col})")
     return position_count;
 
 with open(file_path, 'r') as file:
@@ -129,7 +145,7 @@ height = shape[1]
 print(f"{shape}: {width} x {height}")
 
 _guard = find_guard()
-# print(_guard)
+print(_guard)
 
 visited = move_guard(Guard(_guard.c, _guard.row, _guard.col), copy.deepcopy(_grid))
 
