@@ -49,6 +49,57 @@ def shortest_path(grid, start, end):
     # If we exhaust the queue without finding the end, return an empty list
     return []
 
+def all_shortest_paths(grid, start, end):
+    """
+    Find all shortest paths from start to end in a grid.
+
+    Parameters:
+        grid (list[list[int]]): 2D grid where 0 represents passable cells and 1 represents obstacles.
+        start (tuple): Starting coordinates (x, y).
+        end (tuple): Target coordinates (x, y).
+
+    Returns:
+        list: A list of shortest paths, each path is a list of coordinates [(x1, y1), (x2, y2), ...].
+    """
+    rows, cols = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+    visited = {}  # Maps a cell to the minimum distance to reach it
+    queue = deque([(start, [start])])  # Queue stores (current position, path to reach it)
+    shortest_paths = []  # To store all shortest paths
+    shortest_distance = float('inf')  # Keep track of the minimum distance found
+    
+    visited[start] = 0  # Distance to the starting cell is 0
+
+    while queue:
+        (current_x, current_y), path = queue.popleft()
+        current_distance = len(path)
+
+        # If we exceed the known shortest distance, stop processing
+        if current_distance > shortest_distance:
+            continue
+
+        # If we've reached the end, add the path to shortest_paths
+        if (current_x, current_y) == end:
+            shortest_paths.append(path)
+            shortest_distance = current_distance
+            continue
+
+        # Explore neighbors
+        for dx, dy in directions:
+            neighbor_x, neighbor_y = current_x + dx, current_y + dy
+
+            # Check if the neighbor is within bounds and passable
+            if (0 <= neighbor_x < rows and
+                0 <= neighbor_y < cols and
+                grid[neighbor_x][neighbor_y] != BLOCKAGE):
+
+                # If the neighbor hasn't been visited, or we found a shorter/equal path
+                if (neighbor_x, neighbor_y) not in visited or current_distance < visited[(neighbor_x, neighbor_y)]:
+                    visited[(neighbor_x, neighbor_y)] = current_distance
+                    queue.append(((neighbor_x, neighbor_y), path + [(neighbor_x, neighbor_y)]))
+
+    return shortest_paths
+
 NUMPAD_GRID = [
     ['7', '8', '9'],
     ['4', '5', '6'],
@@ -136,3 +187,6 @@ for line in lines:
     input3 = handle_dirpad_input1(input2)
     print(f"    {input3}")
 
+print("======")
+input3 = handle_dirpad_input1('v<<A>>^A<A>AvA<^AA>A<vAAA>^A')
+print(f"  {input3}")
