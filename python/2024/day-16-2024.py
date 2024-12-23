@@ -1,141 +1,106 @@
-import sys
+import heapq
 
 # file_path = '/home/tom/projects/advent-of-code/resources/input/2024/day16/input_story.txt'
 # file_path = '/home/tom/projects/advent-of-code/resources/input/2024/day16/input_story2.txt'
 file_path = '/home/tom/projects/advent-of-code/resources/input/2024/day16/input.txt'
 
-sys.setrecursionlimit(10000)
+def part1(grid_lines):
+    grid = grid_lines
+    m, n = len(grid), len(grid[0])
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == 'S':
+                start = (i, j)
+            elif grid[i][j] == 'E':
+                end = (i, j)
 
-def find_paths(grid, start, end):
-    rows, cols = len(grid), len(grid[0])
-    paths = []
-    path = []
+    grid[end[0]] = grid[end[0]].replace('E', '.')
 
-    def is_valid(x, y):
-        # Check if the cell is within bounds and not blocked
-        return 0 <= x < rows and 0 <= y < cols and (grid[x][y] == '.' or grid[x][y] == 'E')
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    heap = [(0, 0, *start)]
+    visited = set()
+    while heap:
+        score, d, i, j = heapq.heappop(heap)
+        if (i, j) == end:
+            break
 
-    def dfs(x, y):
-        # If we reach the end, record the path
-        if (x, y) == end:
-            paths.append(path.copy())
-            return
-
-        # Mark the cell as visited
-        grid[x][y] = '#'  # Temporarily block the cell
-        path.append((x, y))
-
-        # Explore all four possible directions
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if is_valid(nx, ny):
-                dfs(nx, ny)
-
-        # Backtrack
-        path.pop()
-        grid[x][y] = '.'  # Unmark the cell
-
-    # Start the DFS
-    dfs(start[0], start[1])
-    return paths
-
-def find_all_paths_iterative(grid, start, end):
-    rows, cols = len(grid), len(grid[0])
-    paths = []
-    stack = [(start, [start])]  # Stack holds (current position, path to position)
-
-    def is_valid(x, y):
-        return 0 <= x < rows and 0 <= y < cols and (grid[x][y] == '.' or grid[x][y] == 'E')
-
-    while stack:
-        (x, y), path = stack.pop()
-
-        # If the end is reached, save the path
-        if (x, y) == end:
-            paths.append(path)
+        if (d, i, j) in visited:
             continue
 
-        # Temporarily block the cell to prevent revisiting
-        grid[x][y] = '#'
+        visited.add((d, i, j))
+        
+        x = i + directions[d][0]
+        y = j + directions[d][1]
+        if grid[x][y] == '.' and (d, x, y) not in visited:
+            heapq.heappush(heap, (score + 1, d, x, y))
+        
+        left = (d - 1) % 4
+        if (left, i, j) not in visited:
+            heapq.heappush(heap, (score + 1000, left, i, j))
 
-        # Explore neighbors
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if is_valid(nx, ny):
-                stack.append(((nx, ny), path + [(nx, ny)]))
+        right = (d + 1) % 4
+        if (right, i, j) not in visited:
+            heapq.heappush(heap, (score + 1000, right, i, j))
 
-        # Unblock the cell for other paths
-        grid[x][y] = '.'
+    return score
 
-    return paths
+def part2(grid_lines):
+    grid = grid_lines
+    m, n = len(grid), len(grid[0])
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == 'S':
+                start = (i, j)
+            elif grid[i][j] == 'E':
+                end = (i, j)
 
+    grid[end[0]] = grid[end[0]].replace('E', '.')
+
+    def can_visit(d, i, j, score):
+        prev_score = visited.get((d, i, j))
+        if prev_score and prev_score < score:
+            return False
+        visited[(d, i, j)] = score
+        return True
+
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    heap = [(0, 0, *start, {start})]
+    visited = {}
+    lowest_score = None
+    winning_paths = set()
+    while heap:
+        score, d, i, j, path = heapq.heappop(heap)
+        if lowest_score and lowest_score < score:
+            break
+
+        if (i, j) == end:
+            lowest_score = score
+            winning_paths |= path
+            continue
+
+        if not can_visit(d, i, j, score):
+            continue
+
+        x = i + directions[d][0]
+        y = j + directions[d][1]
+        if grid[x][y] == '.' and can_visit(d, x, y, score+1):
+            heapq.heappush(heap, (score + 1, d, x, y, path | {(x, y)}))
+        
+        left = (d - 1) % 4
+        if can_visit(left, i, j, score + 1000):
+            heapq.heappush(heap, (score + 1000, left, i, j, path))
+
+        right = (d + 1) % 4
+        if can_visit(right, i, j, score + 1000):
+            heapq.heappush(heap, (score + 1000, right, i, j, path))
+
+    return len(winning_paths)
 
 with open(file_path) as f:
     data = f.read()
 
-grid_list = [[position for position in element] for element in data.split("\n")]
-grid = {(x, y): grid_list[y][x] for y in range(len(grid_list)) for x in range(len(grid_list[0]))}
+score = part1(data.split("\n"))
+print(f"Part 1: {score}")
 
-def find_start():
-    for y, row in enumerate(grid_list):
-        for x, cell in enumerate(row):
-            if (cell == 'S'):
-                return (y,x)
-    raise Exception("Start not found!")
-
-def find_end():
-    for y, row in enumerate(grid_list):
-        for x, cell in enumerate(row):
-            if (cell == 'E'):
-                return (y,x)
-    raise Exception("End not found!")
-
-start = find_start()
-# print(f"start={start}")
-end = find_end()
-# print(f"end={end}")
-
-all_paths = find_all_paths_iterative(grid_list, start, end)
-
-def calculate_path_score(path, end):
-    score = 0
-    path.append(end)
-    cur = path[0]
-    dir = '>'
-    for i in range (1, len(path)):
-        next = path[i]
-        if (cur[1] > next[1]):
-            if (dir == '>'):
-                score += 1
-            else:
-                score += 1001
-                dir = '>'
-        elif (cur[1] < next[1]):
-            if (dir == '<'):
-                score += 1
-            else:
-                score += 1001
-                dir = '<'
-        elif (cur[0] > next[0]):
-            if (dir == '^'):
-                score += 1
-            else:
-                score += 1001
-                dir = '^'
-        elif (cur[0] < next[0]):
-            if (dir == 'v'):
-                score += 1
-            else:
-                score += 1001
-                dir = 'v'
-        cur = next
-    return score;
-
-min_score = -1
-for path in all_paths:
-    score = calculate_path_score(path, end)
-    if (min_score == -1 or score < min_score):
-        print(f"Path found with lower score '{score}': {path}")
-        min_score = score
-
-print(f"Part 1: {min_score}")
+count = part2(data.split("\n"))
+print(f"Part 2: {count}")
