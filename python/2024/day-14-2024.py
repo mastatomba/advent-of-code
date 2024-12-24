@@ -100,7 +100,7 @@ for line in lines:
     robot = create_robot(line)
     robot.move(100)
     quadrants[robot.get_quadrant()] += 1
-    print(robot)
+    # print(robot)
     robots.append(robot)
 
 print(quadrants)
