@@ -3,15 +3,15 @@
 # REGISTER_C=0
 # PROGRAM=[0,1,5,4,3,0]
 
-# REGISTER_A=2024
-# REGISTER_B=0
-# REGISTER_C=0
-# PROGRAM=[0,3,5,4,3,0]
-
-REGISTER_A=46187030
+REGISTER_A=2024
 REGISTER_B=0
 REGISTER_C=0
-PROGRAM=[2,4,1,5,7,5,0,3,4,0,1,6,5,5,3,0]
+PROGRAM=[0,3,5,4,3,0]
+
+# REGISTER_A=46187030
+# REGISTER_B=0
+# REGISTER_C=0
+# PROGRAM=[2,4,1,5,7,5,0,3,4,0,1,6,5,5,3,0]
 
 def calculate_bitwise_xor(number1: int, number2: int):
     result = number1 ^ number2
