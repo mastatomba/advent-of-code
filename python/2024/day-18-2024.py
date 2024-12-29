@@ -1,14 +1,20 @@
-import copy
+from collections import deque
 
 # file_path = '/home/tom/projects/advent-of-code/resources/input/2024/day18/input_story.txt'
-# MAX = 6
+# MAX = 7
 # NR_OF_BYTES = 12
 
 file_path = '/home/tom/projects/advent-of-code/resources/input/2024/day18/input.txt'
-MAX = 10
-NR_OF_BYTES = 0
+MAX = 71
+NR_OF_BYTES = 1024
 
-LOG_LEVEL = 2
+SAFE = '.'
+CORRUPTED = '#'
+
+START = (0,0)
+END = (MAX-1,MAX-1)
+
+LOG_LEVEL = 3
 def log(level: int, message: str):
     if level <= LOG_LEVEL:
         print(message)
@@ -18,112 +24,83 @@ with open(file_path) as f:
 
 lines = data.split("\n")
 
-class GridPos:
-    def __init__(self, x: int, y: int):
-        self.x = x
-        self.y = y
+def print_grid(grid):
+    print('GRID STATE:')
+    for row in range(MAX):
+        s = ''
+        for col in range(MAX):
+            s += grid[row][col]
+        print(s)
 
-    def __str__(self):
-        return f"GridPos(x={self.x}, y={self.y})"
+def shortest_path(grid, start, end):
+    rows, cols = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    visited = set()
+    visited.add(start)
+    queue = deque([(start, [start])])
 
-    def get_key(self):
-        return f"{self.x}_{self.y}"
+    while queue:
+        (current_x, current_y), path = queue.popleft()
 
-class Step:
-    def __init__(self, dir: str, pos: GridPos):
-        self.dir = dir
-        self.pos = pos
+        if (current_x, current_y) == end:
+            return path
 
-    def is_end_step(self):
-        return self.pos.x == MAX and self.pos.y == MAX
-    
-    def is_corrupted(self):
-        return self.pos.get_key() in corrupted
+        for dx, dy in directions:
+            neighbor_x, neighbor_y = current_x + dx, current_y + dy
 
-    def is_outside_grid(self):
-        if (self.pos.x < 0 or self.pos.x > MAX):
-            return True
-        if (self.pos.y < 0 or self.pos.y > MAX):
-            return True
-        return False
+            if (0 <= neighbor_x < rows and
+                0 <= neighbor_y < cols and
+                grid[neighbor_x][neighbor_y] == SAFE and 
+                (neighbor_x, neighbor_y) not in visited):
 
-    def __str__(self):
-        return f"Step(dir={self.dir}, pos={self.pos})"
+                visited.add((neighbor_x, neighbor_y))
+                queue.append(((neighbor_x, neighbor_y), path + [(neighbor_x, neighbor_y)]))
 
-class Path:
-    def __init__(self, steps: list):
-        self.steps = steps
-        self.visited = {}
+    return []
 
-    def __str__(self):
-        return f"Path(steps={self.steps}, visited={self.visited})"
+def visualize_path(grid, path):
+    visual_grid = [row[:] for row in grid]  # Create a copy of the grid
 
-    def get_key(self):
-        directions = ''
-        for step in self.steps:
-            if directions != '':
-                directions += '-'
-            directions += step.dir
-        return directions
- 
-corrupted = {}
-for i in range(NR_OF_BYTES):
-    splitted = lines[i].split(',')
-    pos = GridPos(int(splitted[0]), int(splitted[1]))
-    corrupted[pos.get_key()] = pos
+    for x, y in path:
+        visual_grid[x][y] = 'O'
 
-paths = {}
-min_steps = -1
+    # Replace integers with more readable symbols
+    return [['#' if cell == '#' else 'O' if cell == 'O' else '.' for cell in row] for row in visual_grid]
 
-def get_new_steps(pos: GridPos, path: Path):
-    path_key = path.get_key()
-    log(4, f"{path_key} get_new_steps({pos}) called")
-    steps = [Step('u', GridPos(pos.x,pos.y-1)), Step('d', GridPos(pos.x,pos.y+1)), Step('l', GridPos(pos.x-1,pos.y)), Step('r', GridPos(pos.x+1,pos.y))]
-    new_steps = []
-    for step in steps:
-        log(4, f"{path_key}   checking direction {step.dir}, position ({step.pos})")
-        if (not step.is_corrupted()):
-            if (not step.is_outside_grid()):
-                if step.pos.get_key() not in path.visited:
-                    new_steps.append(step)
-                else:
-                    log(4, f"{path_key}     skipping: position is outside grid..")
-            else:
-                log(4, f"{path_key}     skipping: position is outside grid..")
-        else:
-            log(4, f"{path_key}     skipping: position is corruped..")
-    return new_steps
+def find_shortest_path_after_x_bytes(nr_of_bytes: int):
+    grid = [[SAFE for _ in range(MAX)] for _ in range(MAX)]
 
-def find_all_paths(pos: GridPos, path: Path):
-    path_key = path.get_key()
-    log(4, f"{path_key} find_all_paths({pos}) called")
-    if min_steps != -1 and (len(path.steps) -1) > min_steps:
-        log(2, f"{path_key} longer than minimum steps")
-        return
-    new_steps = get_new_steps(pos, path)
-    for new_step in new_steps:
-        new_path = copy.deepcopy(path)
-        new_path.steps.append(new_step)
-        new_path.visited[new_step.pos.get_key()] = 1
+    # print_grid(grid)
 
-        if (new_step.is_end_step()):
-            log(2, f"{path_key}    found end position! ({new_step.pos})")
-            paths[new_path.get_key()] = new_path
-            nr_of_steps = len(new_path.steps) - 1
-            if min_steps == -1 or min_steps > nr_of_steps:
-                min_steps = nr_of_steps
-        else:
-            find_all_paths(new_step.pos, new_path)
+    for i in range(nr_of_bytes):
+        line = lines[i]
+        splitted = line.split(',')
+        grid[int(splitted[1])][int(splitted[0])] = CORRUPTED
 
-start_pos = GridPos(0,0)
-find_all_paths(start_pos, Path([Step('S', start_pos)]))
+    # print_grid(grid)
 
-# log(3, len(paths))
-# min_steps = -1
-# for key in paths:
-#     steps = len(paths[key].steps) - 1
-#     if min_steps == -1 or min_steps > steps:
-#         log(3, f"Found smaller path {key}: {steps}")
-#         min_steps = steps
+    path = shortest_path(grid, START, END)
+    return grid, path
 
-print(f"Part 1: {min_steps}")
+grid, path = find_shortest_path_after_x_bytes(NR_OF_BYTES)
+log(4, f"Shortest path: {path}")
+
+print(f"Part 1: {len(path)-1}")
+
+low, high = NR_OF_BYTES, len(lines)
+while low < high:
+    nr_of_bytes = (low + high) // 2
+    grid, path = find_shortest_path_after_x_bytes(nr_of_bytes)
+    if (len(path) > 0): # Operation succeeds
+        low = nr_of_bytes + 1
+    else:  # Operation fails
+        high = nr_of_bytes
+
+print(f"Part 2: {lines[low-1]}")
+
+# print last successful path
+# grid, path = find_shortest_path_after_x_bytes(low-1)
+# visualized_grid = visualize_path(grid, path)
+# print("Visualized grid:")
+# for row in visualized_grid:
+#     print(" ".join(row))
