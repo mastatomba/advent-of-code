@@ -26,4 +26,16 @@ public class StringUtils {
     public static int countCharacterInString(String str, char character) {
         return (int)str.chars().filter(ch -> ch == character).count();
     }
+
+    public static boolean isRepeatedExactly(String str, int times) {
+        if (str.length() % times != 0) {
+            return false;
+        }
+
+        int partLength = str.length() / times;
+        String part = str.substring(0, partLength);
+        String result = part.repeat(times);
+
+        return result.equals(str);
+    }
 }
