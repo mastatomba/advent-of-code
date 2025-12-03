@@ -38,4 +38,11 @@ public class StringUtils {
 
         return result.equals(str);
     }
+
+    public static int[] convertToIntArray(String str) {
+        int[] arr = str.chars()
+             .map(c -> c - '0')
+             .toArray();
+        return arr;
+    }
 }
