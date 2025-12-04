@@ -47,11 +47,20 @@ public class StringGrid {
         return columns;
     }
 
-    public char charAt(int rowIndex, int columnIndex) throws Exception {
+    public char charAt(int rowIndex, int columnIndex) throws IndexOutOfBoundsException {
         if (rowIndex >= this.rows.size() || columnIndex >= this.columnSize) {
-            throw new Exception("The indexes are out of bound, grid size is " + this.rows.size() + "x" + this.columnSize);
+            throw new IndexOutOfBoundsException("The indexes are out of bound, grid size is " + this.rows.size() + "x" + this.columnSize);
         }
         return this.rows.get(rowIndex).charAt(columnIndex);
+    }
+
+    public void setCellValue(char value, int rowIndex, int columnIndex) throws IndexOutOfBoundsException {
+        if (rowIndex >= this.rows.size() || columnIndex >= this.columnSize) {
+            throw new IndexOutOfBoundsException("The indexes are out of bound, grid size is " + this.rows.size() + "x" + this.columnSize);
+        }
+        var row = this.rows.get(rowIndex);
+        var newRow = row.substring(0, columnIndex) + value + row.substring(columnIndex + 1);
+        this.rows.set(rowIndex, newRow);
     }
 
     private String getColumn(int columnIndex) {
