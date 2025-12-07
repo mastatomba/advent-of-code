@@ -63,6 +63,14 @@ public class StringGrid {
         this.rows.set(rowIndex, newRow);
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (String row: this.rows) {
+            sb.append(row).append("\n");
+        }
+        return sb.toString();
+    }
+
     private String getColumn(int columnIndex) {
         String column = "";
         for (String row: this.rows) {
