@@ -14,12 +14,12 @@ public class StringGrid {
         this.rows = new ArrayList<>();
     }
 
-    public void addRow(String row) throws Exception {
+    public void addRow(String row) {
         if (this.rows.isEmpty()) {
             this.columnSize = row.length();
         } else {
             if (row.length() != this.columnSize) {
-                throw new Exception("The row has incorrect column size, it should be " + this.columnSize);
+                throw new RuntimeException("The row has incorrect column size, it should be " + this.columnSize);
             }
         }
         this.rows.add(row);
